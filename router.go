@@ -39,7 +39,7 @@ func ConfigureRouter() (router *mux.Router) {
 	}
 
 	router.StrictSlash(true)
-	log.Print("Router successfully initialized")
+	log.Print("Router - OK")
 	return router
 }
 

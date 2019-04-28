@@ -1,0 +1,8 @@
+{
+  "server_host": "127.0.0.1",
+  "server_port": "8000",
+  "server_timeout": 15,
+  "mongodb_host": "127.0.0.1",
+  "mongodb_port": "27017",
+  "mongodb_timeout": 10
+}

@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"flag"
+	"github.com/spf13/viper"
 	"log"
 	"net/http"
 	"os"
@@ -10,27 +11,36 @@ import (
 	"time"
 )
 
+const (
+	serverHost    string = "server_host"
+	serverPort    string = "server_port"
+	serverTimeout string = "server_timeout"
+
+	mongoDbHost    string = "mongodb_host"
+	mongoDbPort    string = "mongodb_port"
+	mongoDbTimeout string = "mongodb_timeout"
+)
+
 func main() {
 	log.Print("Start Payments Server Application")
 
-	repository, mongoClient, err := InitializeMongoRepository()
-	if err != nil {
-		os.Exit(1)
-	}
+	InitializeEnvironmentProperties()
+
+	repository, mongoClient := InitializeMongoRepository()
 
 	SetPaymentRepository(repository)
 
 	router := ConfigureRouter()
 
-	// TODO move to config
-	host := "127.0.0.1"
-	port := "8000"
+	host := viper.GetString(serverHost)
+	port := viper.GetString(serverPort)
+	timeout := time.Duration(viper.GetInt(serverTimeout)) * time.Second
 
 	server := &http.Server{
 		Handler:      router,
 		Addr:         host + ":" + port,
-		WriteTimeout: 15 * time.Second,
-		ReadTimeout:  15 * time.Second,
+		WriteTimeout: timeout,
+		ReadTimeout:  timeout,
 	}
 
 	var wait time.Duration
@@ -59,4 +69,43 @@ func main() {
 	log.Println("Web server stopped")
 
 	os.Exit(0)
+}
+
+func InitializeEnvironmentProperties() {
+	log.Print("Checking environment properties...")
+
+	configurationFile := flag.String("conf", "./config/server.json", "Path to configuration file")
+	flag.Parse()
+
+	viper.SetConfigFile(*configurationFile)
+
+	if err := viper.ReadInConfig(); err != nil {
+		log.Fatalf("Error reading config file, %s", err)
+	}
+
+	if !viper.IsSet(serverHost) {
+		log.Fatal("Server host property is not configured")
+	}
+
+	if !viper.IsSet(serverPort) {
+		log.Fatal("Server port property is not configured")
+	}
+
+	if !viper.IsSet(mongoDbTimeout) {
+		log.Fatal("MongoDB timeout property is not configured")
+	}
+
+	if !viper.IsSet(mongoDbHost) {
+		log.Fatal("MongoDB host property is not configured")
+	}
+
+	if !viper.IsSet(mongoDbPort) {
+		log.Fatal("MongoDB port property is not configured")
+	}
+
+	if !viper.IsSet(mongoDbTimeout) {
+		log.Fatal("MongoDB timeout property is not configured")
+	}
+
+	log.Print("Environment properties - OK")
 }
