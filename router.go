@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/gorilla/mux"
+	"log"
 	"net/http"
 )
 
@@ -26,13 +27,25 @@ func AddRoute(route Route) {
 }
 
 func ConfigureRouter() (router *mux.Router) {
+	log.Print("Initializing router...")
+
 	InitializeRoutes()
 
 	router = mux.NewRouter()
+	router.Use(loggingMiddleware)
+
 	for _, route := range routes {
 		router.HandleFunc(route.Path, route.Handler).Methods(route.Method)
 	}
 
 	router.StrictSlash(true)
+	log.Print("Router successfully initialized")
 	return router
+}
+
+func loggingMiddleware(handler http.Handler) http.Handler {
+	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+		log.Printf("[%s] %s", request.Method, request.RequestURI)
+		handler.ServeHTTP(writer, request)
+	})
 }

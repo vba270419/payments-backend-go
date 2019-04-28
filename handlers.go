@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
+	"log"
 	"net/http"
 )
 
@@ -18,7 +19,9 @@ func PrepareSuccessHeader(writer http.ResponseWriter, statusCode int) {
 	writer.WriteHeader(statusCode)
 }
 
-func PrepareFailureHeader(writer http.ResponseWriter, err error) {
+func PrepareFailureHeader(writer http.ResponseWriter, request *http.Request, err error) {
+	log.Printf("Request [%s] %s with processed error `%s`", request.Method, request.RequestURI, err.Error())
+
 	writer.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
 	switch err.(type) {
@@ -53,11 +56,10 @@ func DecodeAndValidatePayment(request *http.Request, create bool) (payment Payme
 	return payment, nil
 }
 
-// TODO log errors
 func CreatePaymentHandler(writer http.ResponseWriter, request *http.Request) {
 	var payment, err = DecodeAndValidatePayment(request, true)
 	if err != nil {
-		PrepareFailureHeader(writer, err)
+		PrepareFailureHeader(writer, request, err)
 		return
 	}
 
@@ -67,7 +69,7 @@ func CreatePaymentHandler(writer http.ResponseWriter, request *http.Request) {
 
 	err = paymentRepository.InsertPayment(payment)
 	if err != nil {
-		PrepareFailureHeader(writer, err)
+		PrepareFailureHeader(writer, request, err)
 		return
 	}
 
@@ -75,17 +77,16 @@ func CreatePaymentHandler(writer http.ResponseWriter, request *http.Request) {
 	writer.Header().Set("Location", string(request.URL.Path)+"/"+payment.ID)
 }
 
-// TODO log errors
 func UpdatePaymentHandler(writer http.ResponseWriter, request *http.Request) {
 	var payment, err = DecodeAndValidatePayment(request, false)
 	if err != nil {
-		PrepareFailureHeader(writer, err)
+		PrepareFailureHeader(writer, request, err)
 		return
 	}
 
 	err = paymentRepository.UpdatePayment(payment)
 	if err != nil {
-		PrepareFailureHeader(writer, err)
+		PrepareFailureHeader(writer, request, err)
 		return
 	}
 
@@ -93,43 +94,40 @@ func UpdatePaymentHandler(writer http.ResponseWriter, request *http.Request) {
 	writer.Header().Set("Location", string(request.URL.Path)+"/"+payment.ID)
 }
 
-// TODO log errors
 func DeletePaymentHandler(writer http.ResponseWriter, request *http.Request) {
 	paymentId := mux.Vars(request)["id"]
 
 	err := paymentRepository.DeletePayment(paymentId)
 	if err != nil {
-		PrepareFailureHeader(writer, err)
+		PrepareFailureHeader(writer, request, err)
 		return
 	}
 
 	PrepareSuccessHeader(writer, http.StatusOK)
 }
 
-// TODO log errors
 func GetPaymentHandler(writer http.ResponseWriter, request *http.Request) {
 	paymentId := mux.Vars(request)["id"]
 
 	payment, err := paymentRepository.GetPayment(paymentId)
 
 	if err != nil {
-		PrepareFailureHeader(writer, err)
+		PrepareFailureHeader(writer, request, err)
 		return
 	}
 
 	PrepareSuccessHeader(writer, http.StatusOK)
-	json.NewEncoder(writer).Encode(payment)
+	_ = json.NewEncoder(writer).Encode(payment)
 }
 
-// TODO log errors
 func GetAllPaymentsHandler(writer http.ResponseWriter, request *http.Request) {
 	payments, err := paymentRepository.GetAllPayments()
 
 	if err != nil {
-		PrepareFailureHeader(writer, err)
+		PrepareFailureHeader(writer, request, err)
 		return
 	}
 
 	PrepareSuccessHeader(writer, http.StatusOK)
-	json.NewEncoder(writer).Encode(payments)
+	_ = json.NewEncoder(writer).Encode(payments)
 }

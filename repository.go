@@ -21,25 +21,38 @@ type PaymentRepository interface {
 	GetAllPayments() (payments []Payment, err error)
 }
 
-// TODO logging
 type MongoClientProvider struct {
 	client *mongo.Client
 }
 
 func GetCollection(client *mongo.Client) *mongo.Collection {
-	return client.Database("example").Collection("books")
+	return client.Database("account_book").Collection("payments")
 }
 
-func InitializeMongoRepository() (PaymentRepository, error) {
+func InitializeMongoRepository() (PaymentRepository, *mongo.Client, error) {
+	host := "localhost"
+	port := "27017"
+
+	log.Printf("Initialize connection to MongoDB [%s:%s] ... ", host, port)
+
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 	mongoClient, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:27017"))
 
 	if err != nil {
-		log.Fatal("Establishing connection to database failed!")
+		log.Fatalf("Failed to establish connection to MongoDB [%s:%s]: %s", host, port, err.Error())
 	}
 
-	mongo := &MongoClientProvider{client: mongoClient}
-	return mongo, err
+	repository := &MongoClientProvider{client: mongoClient}
+	log.Printf("Connection to MongoDB [%s:%s] successfully established", host, port)
+
+	return repository, mongoClient, err
+}
+
+func ShutdownMongoRepository(client *mongo.Client) {
+	log.Println("Disconnecting from to MongoDB ... ")
+	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	_ = client.Disconnect(ctx)
+	log.Println("Disconnected from to MongoDB")
 }
 
 func (m *MongoClientProvider) InsertPayment(payment Payment) (err error) {
@@ -48,6 +61,7 @@ func (m *MongoClientProvider) InsertPayment(payment Payment) (err error) {
 
 	_, err = collection.InsertOne(ctx, payment)
 	if err != nil {
+		log.Printf("Unexpected error while inserting: %s", err.Error())
 		return &PersistenceError{}
 	}
 
@@ -67,6 +81,7 @@ func (m *MongoClientProvider) UpdatePayment(payment Payment) (err error) {
 
 	result, err := collection.UpdateOne(ctx, filter, update)
 	if err != nil {
+		log.Printf("Unexpected error while updating: %s", err.Error())
 		return &PersistenceError{}
 	}
 
@@ -88,12 +103,13 @@ func (m *MongoClientProvider) DeletePayment(paymentId string) (err error) {
 
 	result, err := collection.DeleteOne(ctx, filter)
 
-	if result.DeletedCount == 0 {
-		return &NotFoundError{paymentId}
+	if err != nil {
+		log.Printf("Unexpected error while deleting: %s", err.Error())
+		return &PersistenceError{}
 	}
 
-	if err != nil {
-		return &PersistenceError{}
+	if result.DeletedCount == 0 {
+		return &NotFoundError{paymentId}
 	}
 
 	return err
@@ -106,10 +122,12 @@ func (m *MongoClientProvider) GetPayment(paymentId string) (payment Payment, err
 	filter := bson.M{"_id": paymentId}
 	err = collection.FindOne(ctx, filter).Decode(&payment)
 
-	if err != nil && err.Error() == "mongo: no documents in result" {
-		return payment, &NotFoundError{paymentId}
+	if err != nil {
+		if err.Error() == "mongo: no documents in result" {
+			return payment, &NotFoundError{paymentId}
+		}
+		log.Printf("Unexpected error while loading: %s", err.Error())
 	}
-
 	return payment, err
 }
 
@@ -121,6 +139,7 @@ func (m *MongoClientProvider) GetAllPayments() (payments []Payment, err error) {
 	cursor, err := collection.Find(ctx, filter)
 
 	if err != nil {
+		log.Printf("Unexpected error while loading: %s", err.Error())
 		return payments, &PersistenceError{}
 	}
 
@@ -128,11 +147,12 @@ func (m *MongoClientProvider) GetAllPayments() (payments []Payment, err error) {
 		var payment Payment
 		err = cursor.Decode(&payment)
 		if err != nil {
+			log.Printf("Unexpected error while loading: %s", err.Error())
 			break
 		}
 		payments = append(payments, payment)
 	}
 
-	cursor.Close(ctx)
+	_ = cursor.Close(ctx)
 	return payments, err
 }
