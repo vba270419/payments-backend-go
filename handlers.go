@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"log"
@@ -12,6 +13,11 @@ var paymentRepository PaymentRepository
 
 func SetPaymentRepository(repository PaymentRepository) {
 	paymentRepository = repository
+}
+
+func WriteHeaderLocation(writer http.ResponseWriter, request *http.Request, paymentId string) {
+	location := fmt.Sprintf("%s%s/%s", request.Host, string(request.URL.Path), paymentId)
+	writer.Header().Set("Location", location)
 }
 
 func PrepareSuccessHeader(writer http.ResponseWriter, statusCode int) {
@@ -73,8 +79,8 @@ func CreatePaymentHandler(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
+	WriteHeaderLocation(writer, request, payment.ID)
 	PrepareSuccessHeader(writer, http.StatusCreated)
-	writer.Header().Set("Location", string(request.URL.Path)+"/"+payment.ID)
 }
 
 func UpdatePaymentHandler(writer http.ResponseWriter, request *http.Request) {
@@ -90,8 +96,8 @@ func UpdatePaymentHandler(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 
+	WriteHeaderLocation(writer, request, payment.ID)
 	PrepareSuccessHeader(writer, http.StatusOK)
-	writer.Header().Set("Location", string(request.URL.Path)+"/"+payment.ID)
 }
 
 func DeletePaymentHandler(writer http.ResponseWriter, request *http.Request) {
