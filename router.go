@@ -30,11 +30,11 @@ type Route struct {
 var routes []Route
 
 func InitializeRoutes() {
-	AddRoute(Route{createPaymentPath, methodPost, CreatePaymentHandler})
-	AddRoute(Route{updatePaymentPath, methodPut, UpdatePaymentHandler})
-	AddRoute(Route{deletePaymentPath, methodDelete, DeletePaymentHandler})
-	AddRoute(Route{getPaymentPath, methodGet, GetPaymentHandler})
-	AddRoute(Route{getAllPaymentsPath, methodGet, GetAllPaymentsHandler})
+	AddRoute(Route{createPaymentPath, methodPost, CreatePaymentEndpoint})
+	AddRoute(Route{updatePaymentPath, methodPut, UpdatePaymentEndpoint})
+	AddRoute(Route{deletePaymentPath, methodDelete, DeletePaymentEndpoint})
+	AddRoute(Route{getPaymentPath, methodGet, GetPaymentEndpoint})
+	AddRoute(Route{getAllPaymentsPath, methodGet, GetAllPaymentsEndpoint})
 }
 
 func AddRoute(route Route) {

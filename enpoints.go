@@ -61,7 +61,7 @@ func DecodeAndValidatePayment(request *http.Request, create bool) (payment Payme
 	return payment, nil
 }
 
-func CreatePaymentHandler(writer http.ResponseWriter, request *http.Request) {
+func CreatePaymentEndpoint(writer http.ResponseWriter, request *http.Request) {
 	var payment, err = DecodeAndValidatePayment(request, true)
 	if err != nil {
 		PrepareFailureHeader(writer, request, err)
@@ -82,7 +82,7 @@ func CreatePaymentHandler(writer http.ResponseWriter, request *http.Request) {
 	PrepareSuccessHeader(writer, http.StatusCreated)
 }
 
-func UpdatePaymentHandler(writer http.ResponseWriter, request *http.Request) {
+func UpdatePaymentEndpoint(writer http.ResponseWriter, request *http.Request) {
 	var payment, err = DecodeAndValidatePayment(request, false)
 	if err != nil {
 		PrepareFailureHeader(writer, request, err)
@@ -99,7 +99,7 @@ func UpdatePaymentHandler(writer http.ResponseWriter, request *http.Request) {
 	PrepareSuccessHeader(writer, http.StatusOK)
 }
 
-func DeletePaymentHandler(writer http.ResponseWriter, request *http.Request) {
+func DeletePaymentEndpoint(writer http.ResponseWriter, request *http.Request) {
 	paymentId := mux.Vars(request)["id"]
 
 	err := paymentRepository.DeletePayment(paymentId)
@@ -111,7 +111,7 @@ func DeletePaymentHandler(writer http.ResponseWriter, request *http.Request) {
 	PrepareSuccessHeader(writer, http.StatusOK)
 }
 
-func GetPaymentHandler(writer http.ResponseWriter, request *http.Request) {
+func GetPaymentEndpoint(writer http.ResponseWriter, request *http.Request) {
 	paymentId := mux.Vars(request)["id"]
 
 	payment, err := paymentRepository.GetPayment(paymentId)
@@ -132,7 +132,7 @@ func GetPaymentHandler(writer http.ResponseWriter, request *http.Request) {
 	_ = json.NewEncoder(writer).Encode(result)
 }
 
-func GetAllPaymentsHandler(writer http.ResponseWriter, request *http.Request) {
+func GetAllPaymentsEndpoint(writer http.ResponseWriter, request *http.Request) {
 	payments, err := paymentRepository.GetAllPayments()
 
 	if err != nil {
