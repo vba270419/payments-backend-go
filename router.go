@@ -1,9 +1,24 @@
 package main
 
 import (
+	"fmt"
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
+	"strings"
+)
+
+const (
+	methodPost   string = "POST"
+	methodPut    string = "PUT"
+	methodDelete string = "DELETE"
+	methodGet    string = "GET"
+
+	createPaymentPath  string = "/v1/payments/create"
+	updatePaymentPath  string = "/v1/payments/update"
+	deletePaymentPath  string = "/v1/payments/delete/{id}"
+	getPaymentPath     string = "/v1/payments/get/{id}"
+	getAllPaymentsPath string = "/v1/payments/all"
 )
 
 type Route struct {
@@ -15,11 +30,11 @@ type Route struct {
 var routes []Route
 
 func InitializeRoutes() {
-	AddRoute(Route{"/payments/v1/payment", "POST", CreatePaymentHandler})
-	AddRoute(Route{"/payments/v1/payment", "PUT", UpdatePaymentHandler})
-	AddRoute(Route{"/payments/v1/payment/{id}", "DELETE", DeletePaymentHandler})
-	AddRoute(Route{"/payments/v1/payment/{id}", "GET", GetPaymentHandler})
-	AddRoute(Route{"/payments/v1/payments", "GET", GetAllPaymentsHandler})
+	AddRoute(Route{createPaymentPath, methodPost, CreatePaymentHandler})
+	AddRoute(Route{updatePaymentPath, methodPut, UpdatePaymentHandler})
+	AddRoute(Route{deletePaymentPath, methodDelete, DeletePaymentHandler})
+	AddRoute(Route{getPaymentPath, methodGet, GetPaymentHandler})
+	AddRoute(Route{getAllPaymentsPath, methodGet, GetAllPaymentsHandler})
 }
 
 func AddRoute(route Route) {
@@ -32,7 +47,7 @@ func ConfigureRouter() (router *mux.Router) {
 	InitializeRoutes()
 
 	router = mux.NewRouter()
-	router.Use(loggingMiddleware)
+	router.Use(LoggingMiddleware)
 
 	for _, route := range routes {
 		router.HandleFunc(route.Path, route.Handler).Methods(route.Method)
@@ -43,9 +58,17 @@ func ConfigureRouter() (router *mux.Router) {
 	return router
 }
 
-func loggingMiddleware(handler http.Handler) http.Handler {
+func LoggingMiddleware(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
 		log.Printf("[%s] %s", request.Method, request.RequestURI)
 		handler.ServeHTTP(writer, request)
 	})
+}
+
+func PreparePaymentURL(path string, paymentId string) string {
+	return strings.ReplaceAll(path, "{id}", paymentId)
+}
+
+func PrepareFullPaymentURL(host string, path string, paymentId string) string {
+	return fmt.Sprintf("http://%s%s", host, PreparePaymentURL(path, paymentId))
 }

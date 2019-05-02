@@ -11,7 +11,7 @@ func TestParsePaymentsList(t *testing.T) {
 	file, err := ioutil.ReadFile("test_resources/payments.json")
 	Nil(t, err)
 
-	var payments PaymentsList
+	var payments PaymentListResult
 	err = json.Unmarshal([]byte(file), &payments)
 	Nil(t, err)
 
@@ -38,7 +38,7 @@ func TestParsePaymentJson(t *testing.T) {
 	Equal(t, "W Owens", payment.Attributes.BeneficiaryParty.AccountName)
 	Equal(t, "31926819", payment.Attributes.BeneficiaryParty.AccountNumber)
 	Equal(t, "BBAN", payment.Attributes.BeneficiaryParty.AccountNumberCode)
-	Equal(t, uint(0), payment.Attributes.BeneficiaryParty.AccountType)
+	Equal(t, 0, payment.Attributes.BeneficiaryParty.AccountType)
 	Equal(t, "1 The Beneficiary Localtown SE2", payment.Attributes.BeneficiaryParty.Address)
 	Equal(t, "403000", payment.Attributes.BeneficiaryParty.BankId)
 	Equal(t, "GBDSC", payment.Attributes.BeneficiaryParty.BankIdCode)

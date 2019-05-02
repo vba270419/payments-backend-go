@@ -1,12 +1,19 @@
 package main
 
-type PaymentsList struct {
+type PaymentListResult struct {
 	Data  []Payment `json:"data,omitempty"`
 	Links Links     `json:"links,omitempty"`
 }
 
+type PaymentResult struct {
+	Data  Payment `json:"data,omitempty"`
+	Links Links   `json:"links,omitempty"`
+}
+
 type Links struct {
-	Self string `json:"self,omitempty"`
+	Self   string `json:"self,omitempty"`
+	Update string `json:"update,omitempty"`
+	Delete string `json:"delete,omitempty"`
 }
 
 type Payment struct {
@@ -53,7 +60,7 @@ type DebtorParty struct {
 
 type BeneficiaryParty struct {
 	*DebtorParty
-	AccountType uint `json:"account_type,omitempty" bson:"account_type,omitempty"`
+	AccountType int `json:"account_type,omitempty" bson:"account_type,omitempty"`
 }
 
 type ChargesInformation struct {

@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"log"
@@ -16,7 +15,7 @@ func SetPaymentRepository(repository PaymentRepository) {
 }
 
 func WriteHeaderLocation(writer http.ResponseWriter, request *http.Request, paymentId string) {
-	location := fmt.Sprintf("%s%s/%s", request.Host, string(request.URL.Path), paymentId)
+	location := PrepareFullPaymentURL(request.Host, getPaymentPath, paymentId)
 	writer.Header().Set("Location", location)
 }
 
@@ -71,7 +70,7 @@ func CreatePaymentHandler(writer http.ResponseWriter, request *http.Request) {
 
 	newUuid, _ := uuid.NewUUID()
 	payment.ID = newUuid.String()
-	payment.Version = 0
+	payment.Version = 1
 
 	err = paymentRepository.InsertPayment(payment)
 	if err != nil {
@@ -123,7 +122,14 @@ func GetPaymentHandler(writer http.ResponseWriter, request *http.Request) {
 	}
 
 	PrepareSuccessHeader(writer, http.StatusOK)
-	_ = json.NewEncoder(writer).Encode(payment)
+
+	links := Links{
+		Self:   PrepareFullPaymentURL(request.Host, getPaymentPath, paymentId),
+		Update: PrepareFullPaymentURL(request.Host, updatePaymentPath, ""),
+		Delete: PrepareFullPaymentURL(request.Host, deletePaymentPath, paymentId)}
+
+	result := PaymentResult{payment, links}
+	_ = json.NewEncoder(writer).Encode(result)
 }
 
 func GetAllPaymentsHandler(writer http.ResponseWriter, request *http.Request) {
@@ -135,5 +141,10 @@ func GetAllPaymentsHandler(writer http.ResponseWriter, request *http.Request) {
 	}
 
 	PrepareSuccessHeader(writer, http.StatusOK)
-	_ = json.NewEncoder(writer).Encode(payments)
+
+	links := Links{
+		Self: PrepareFullPaymentURL(request.Host, getAllPaymentsPath, "")}
+
+	result := PaymentListResult{payments, links}
+	_ = json.NewEncoder(writer).Encode(result)
 }

@@ -9,7 +9,6 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
-	"strings"
 	"testing"
 )
 
@@ -87,26 +86,26 @@ func (m *PaymentRepositoryMock) GetAllPayments() (payments []Payment, err error)
 // Test payment creation handler
 
 func TestCreatePaymentSuccessful(t *testing.T) {
-	response := ServeHTTP("POST", "/payments/v1/payment", MockPayment("", "123"), successful)
+	response := ServeHTTP(methodPost, createPaymentPath, MockPayment("", "123"), successful)
 
 	Equal(t, 201, response.Code)
-	True(t, strings.HasPrefix(response.Header().Get("Location"), "/payments/v1/payment"))
+	Contains(t, response.Header().Get("Location"), "/v1/payments/get")
 }
 
 func TestCreatePaymentEmptyBody(t *testing.T) {
-	response := ServeHTTP("POST", "/payments/v1/payment", http.NoBody, successful)
+	response := ServeHTTP(methodPost, createPaymentPath, http.NoBody, successful)
 
 	Equal(t, 400, response.Code)
 }
 
 func TestCreatePaymentInvalidFormat(t *testing.T) {
-	response := ServeHTTP("POST", "/payments/v1/payment", MockPayment("", ""), successful)
+	response := ServeHTTP(methodPost, createPaymentPath, MockPayment("", ""), successful)
 
 	Equal(t, 400, response.Code)
 }
 
 func TestCreatePaymentServerFailed(t *testing.T) {
-	response := ServeHTTP("POST", "/payments/v1/payment", MockPayment("", "123"), dbFailure)
+	response := ServeHTTP(methodPost, createPaymentPath, MockPayment("", "123"), dbFailure)
 
 	Equal(t, 500, response.Code)
 }
@@ -114,38 +113,38 @@ func TestCreatePaymentServerFailed(t *testing.T) {
 // Test payment update handler
 
 func TestUpdatePaymentSuccessful(t *testing.T) {
-	response := ServeHTTP("PUT", "/payments/v1/payment", MockPayment("1", "123"), successful)
+	response := ServeHTTP(methodPut, updatePaymentPath, MockPayment("1", "123"), successful)
 
 	Equal(t, 200, response.Code)
-	Equal(t, response.Header().Get("Location"), "/payments/v1/payment/1")
+	Contains(t, response.Header().Get("Location"), "/v1/payments/get/1")
 }
 
 func TestUpdatePaymentNotFound(t *testing.T) {
-	response := ServeHTTP("PUT", "/payments/v1/payment", MockPayment("1", "123"), notFound)
+	response := ServeHTTP(methodPut, updatePaymentPath, MockPayment("1", "123"), notFound)
 
 	Equal(t, 404, response.Code)
 }
 
 func TestUpdatePaymentVersionConflict(t *testing.T) {
-	response := ServeHTTP("PUT", "/payments/v1/payment", MockPayment("1", "123"), versionConflict)
+	response := ServeHTTP(methodPut, updatePaymentPath, MockPayment("1", "123"), versionConflict)
 
 	Equal(t, 409, response.Code)
 }
 
 func TestUpdatePaymentEmptyBody(t *testing.T) {
-	response := ServeHTTP("PUT", "/payments/v1/payment", http.NoBody, successful)
+	response := ServeHTTP(methodPut, updatePaymentPath, http.NoBody, successful)
 
 	Equal(t, 400, response.Code)
 }
 
 func TestUpdatePaymentNoId(t *testing.T) {
-	response := ServeHTTP("PUT", "/payments/v1/payment", MockPayment("", "123"), successful)
+	response := ServeHTTP(methodPut, updatePaymentPath, MockPayment("", "123"), successful)
 
 	Equal(t, 400, response.Code)
 }
 
 func TestUpdatePaymentServerFailed(t *testing.T) {
-	response := ServeHTTP("PUT", "/payments/v1/payment", MockPayment("1", "123"), dbFailure)
+	response := ServeHTTP(methodPut, updatePaymentPath, MockPayment("1", "123"), dbFailure)
 
 	Equal(t, 500, response.Code)
 }
@@ -153,44 +152,44 @@ func TestUpdatePaymentServerFailed(t *testing.T) {
 // Test payment delete handler
 
 func TestDeletePaymentSuccessful(t *testing.T) {
-	response := ServeHTTP("DELETE", "/payments/v1/payment/1", http.NoBody, successful)
+	response := ServeHTTP(methodDelete, PreparePaymentURL(deletePaymentPath, "1"), http.NoBody, successful)
 
 	Equal(t, 200, response.Code)
 }
 
 func TestDeletePaymentNotFound(t *testing.T) {
-	response := ServeHTTP("DELETE", "/payments/v1/payment/1", http.NoBody, notFound)
+	response := ServeHTTP(methodDelete, PreparePaymentURL(deletePaymentPath, "1"), http.NoBody, notFound)
 
 	Equal(t, 404, response.Code)
 }
 
 func TestDeletePaymentServerFailed(t *testing.T) {
-	response := ServeHTTP("DELETE", "/payments/v1/payment/1", http.NoBody, dbFailure)
+	response := ServeHTTP(methodDelete, PreparePaymentURL(deletePaymentPath, "1"), http.NoBody, dbFailure)
 
 	Equal(t, 500, response.Code)
 }
 
 // Test get payment handler
 func TestGetPaymentSuccessful(t *testing.T) {
-	response := ServeHTTP("GET", "/payments/v1/payment/2", http.NoBody, successful)
+	response := ServeHTTP(methodGet, PreparePaymentURL(getPaymentPath, "2"), http.NoBody, successful)
 
-	var payment Payment
-	_ = json.NewDecoder(response.Body).Decode(&payment)
+	var paymentResult PaymentResult
+	_ = json.NewDecoder(response.Body).Decode(&paymentResult)
 
 	Equal(t, 200, response.Code)
-	Equal(t, "2", payment.ID)
-	Equal(t, "123", payment.OrganisationId)
-	Equal(t, 1, payment.Version)
+	Equal(t, "2", paymentResult.Data.ID)
+	Equal(t, "123", paymentResult.Data.OrganisationId)
+	Equal(t, 1, paymentResult.Data.Version)
 }
 
 func TestGetPaymentNotFound(t *testing.T) {
-	response := ServeHTTP("GET", "/payments/v1/payment/1", http.NoBody, notFound)
+	response := ServeHTTP(methodGet, PreparePaymentURL(getPaymentPath, "1"), http.NoBody, notFound)
 
 	Equal(t, 404, response.Code)
 }
 
 func TestGetPaymentServerFailed(t *testing.T) {
-	response := ServeHTTP("GET", "/payments/v1/payment/1", http.NoBody, dbFailure)
+	response := ServeHTTP(methodGet, PreparePaymentURL(getPaymentPath, "1"), http.NoBody, dbFailure)
 
 	Equal(t, 500, response.Code)
 }
@@ -198,25 +197,25 @@ func TestGetPaymentServerFailed(t *testing.T) {
 // Test get all payments handler
 
 func TestGetAllPaymentsSuccessful(t *testing.T) {
-	response := ServeHTTP("GET", "/payments/v1/payments", http.NoBody, successful)
+	response := ServeHTTP(methodGet, getAllPaymentsPath, http.NoBody, successful)
 
-	var payments []Payment
-	_ = json.NewDecoder(response.Body).Decode(&payments)
+	var result PaymentListResult
+	_ = json.NewDecoder(response.Body).Decode(&result)
 
 	Equal(t, 200, response.Code)
-	Equal(t, 3, len(payments))
+	Equal(t, 3, len(result.Data))
 
-	Equal(t, "1", payments[0].ID)
-	Equal(t, "2", payments[1].ID)
-	Equal(t, "3", payments[2].ID)
+	Equal(t, "1", result.Data[0].ID)
+	Equal(t, "2", result.Data[1].ID)
+	Equal(t, "3", result.Data[2].ID)
 
-	Equal(t, "123", payments[0].OrganisationId)
-	Equal(t, "456", payments[1].OrganisationId)
-	Equal(t, "789", payments[2].OrganisationId)
+	Equal(t, "123", result.Data[0].OrganisationId)
+	Equal(t, "456", result.Data[1].OrganisationId)
+	Equal(t, "789", result.Data[2].OrganisationId)
 }
 
 func TestGetAllPaymentsServerFailed(t *testing.T) {
-	response := ServeHTTP("GET", "/payments/v1/payments", http.NoBody, dbFailure)
+	response := ServeHTTP(methodGet, getAllPaymentsPath, http.NoBody, dbFailure)
 
 	Equal(t, 500, response.Code)
 }
