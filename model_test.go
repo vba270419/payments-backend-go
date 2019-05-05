@@ -29,7 +29,7 @@ func TestParsePaymentJson(t *testing.T) {
 
 	Equal(t, "Payment", payment.Type)
 	Equal(t, "4ee3a8d8-ca7b-4290-a52c-dd5b6165ec43", payment.ID)
-	Equal(t, 0, payment.Version)
+	Equal(t, 1, payment.Version)
 	Equal(t, "743d5b63-8e6f-432e-a8fa-c5d8d2ee5fcb", payment.OrganisationID)
 
 	Equal(t, float64(100.21), payment.Attributes.Amount)
