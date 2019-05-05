@@ -226,7 +226,7 @@ func MockRouter(mode string) (router *mux.Router) {
 	repository := new(PaymentRepositoryMock)
 	repository.mode = mode
 
-	SetPaymentRepository(repository)
+	setPaymentRepository(repository)
 	router = configureRouter()
 	return router
 }

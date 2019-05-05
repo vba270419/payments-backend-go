@@ -28,7 +28,7 @@ func main() {
 
 	repository, mongoClient := initializeMongoRepository()
 
-	SetPaymentRepository(repository)
+	setPaymentRepository(repository)
 
 	router := configureRouter()
 
