@@ -46,10 +46,10 @@ func (m *PaymentRepositoryMock) UpdatePayment(payment Payment) (err error) {
 	}
 }
 
-func (m *PaymentRepositoryMock) DeletePayment(paymentId string) (err error) {
+func (m *PaymentRepositoryMock) DeletePayment(paymentID string) (err error) {
 	switch m.mode {
 	case notFound:
-		return &NotFoundError{paymentId}
+		return &NotFoundError{paymentID}
 	case dbFailure:
 		return &PersistenceError{}
 	default:
@@ -57,12 +57,12 @@ func (m *PaymentRepositoryMock) DeletePayment(paymentId string) (err error) {
 	}
 }
 
-func (m *PaymentRepositoryMock) GetPayment(paymentId string) (payment Payment, err error) {
-	payment = Payment{ID: paymentId, OrganisationID: "123", Version: 1}
+func (m *PaymentRepositoryMock) GetPayment(paymentID string) (payment Payment, err error) {
+	payment = Payment{ID: paymentID, OrganisationID: "123", Version: 1}
 
 	switch m.mode {
 	case notFound:
-		return payment, &NotFoundError{paymentId}
+		return payment, &NotFoundError{paymentID}
 	case dbFailure:
 		return payment, &PersistenceError{}
 	default:
@@ -231,8 +231,8 @@ func MockRouter(mode string) (router *mux.Router) {
 	return router
 }
 
-func MockPayment(id string, organisationId string) *bytes.Buffer {
-	payment := &Payment{ID: id, OrganisationID: organisationId}
+func MockPayment(id string, organisationID string) *bytes.Buffer {
+	payment := &Payment{ID: id, OrganisationID: organisationID}
 	jsonPayment, _ := json.Marshal(payment)
 	return bytes.NewBuffer(jsonPayment)
 }
