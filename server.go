@@ -24,13 +24,13 @@ const (
 func main() {
 	log.Print("Start Payments Server Application")
 
-	InitializeEnvironmentProperties()
+	initializeEnvironmentProperties()
 
 	repository, mongoClient := InitializeMongoRepository()
 
 	SetPaymentRepository(repository)
 
-	router := ConfigureRouter()
+	router := configureRouter()
 
 	host := viper.GetString(serverHost)
 	port := viper.GetString(serverPort)
@@ -71,7 +71,7 @@ func main() {
 	os.Exit(0)
 }
 
-func InitializeEnvironmentProperties() {
+func initializeEnvironmentProperties() {
 	log.Print("Checking environment properties...")
 
 	configurationFile := flag.String("conf", "./config/server.json", "Path to configuration file")

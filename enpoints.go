@@ -15,7 +15,7 @@ func SetPaymentRepository(repository PaymentRepository) {
 }
 
 func WriteHeaderLocation(writer http.ResponseWriter, request *http.Request, paymentId string) {
-	location := PrepareFullPaymentURL(request.Host, getPaymentPath, paymentId)
+	location := prepareFullPaymentURL(request.Host, getPaymentPath, paymentId)
 	writer.Header().Set("Location", location)
 }
 
@@ -124,9 +124,9 @@ func GetPaymentEndpoint(writer http.ResponseWriter, request *http.Request) {
 	PrepareSuccessHeader(writer, http.StatusOK)
 
 	links := Links{
-		Self:   PrepareFullPaymentURL(request.Host, getPaymentPath, paymentId),
-		Update: PrepareFullPaymentURL(request.Host, updatePaymentPath, ""),
-		Delete: PrepareFullPaymentURL(request.Host, deletePaymentPath, paymentId)}
+		Self:   prepareFullPaymentURL(request.Host, getPaymentPath, paymentId),
+		Update: prepareFullPaymentURL(request.Host, updatePaymentPath, ""),
+		Delete: prepareFullPaymentURL(request.Host, deletePaymentPath, paymentId)}
 
 	result := PaymentResult{payment, links}
 	_ = json.NewEncoder(writer).Encode(result)
@@ -143,7 +143,7 @@ func GetAllPaymentsEndpoint(writer http.ResponseWriter, request *http.Request) {
 	PrepareSuccessHeader(writer, http.StatusOK)
 
 	links := Links{
-		Self: PrepareFullPaymentURL(request.Host, getAllPaymentsPath, "")}
+		Self: prepareFullPaymentURL(request.Host, getAllPaymentsPath, "")}
 
 	result := PaymentListResult{payments, links}
 	_ = json.NewEncoder(writer).Encode(result)

@@ -152,26 +152,26 @@ func TestUpdatePaymentServerFailed(t *testing.T) {
 // Test payment delete handler
 
 func TestDeletePaymentSuccessful(t *testing.T) {
-	response := ServeHTTP(methodDelete, PreparePaymentURL(deletePaymentPath, "1"), http.NoBody, successful)
+	response := ServeHTTP(methodDelete, preparePaymentURL(deletePaymentPath, "1"), http.NoBody, successful)
 
 	Equal(t, 200, response.Code)
 }
 
 func TestDeletePaymentNotFound(t *testing.T) {
-	response := ServeHTTP(methodDelete, PreparePaymentURL(deletePaymentPath, "1"), http.NoBody, notFound)
+	response := ServeHTTP(methodDelete, preparePaymentURL(deletePaymentPath, "1"), http.NoBody, notFound)
 
 	Equal(t, 404, response.Code)
 }
 
 func TestDeletePaymentServerFailed(t *testing.T) {
-	response := ServeHTTP(methodDelete, PreparePaymentURL(deletePaymentPath, "1"), http.NoBody, dbFailure)
+	response := ServeHTTP(methodDelete, preparePaymentURL(deletePaymentPath, "1"), http.NoBody, dbFailure)
 
 	Equal(t, 500, response.Code)
 }
 
 // Test get payment handler
 func TestGetPaymentSuccessful(t *testing.T) {
-	response := ServeHTTP(methodGet, PreparePaymentURL(getPaymentPath, "2"), http.NoBody, successful)
+	response := ServeHTTP(methodGet, preparePaymentURL(getPaymentPath, "2"), http.NoBody, successful)
 
 	var paymentResult PaymentResult
 	_ = json.NewDecoder(response.Body).Decode(&paymentResult)
@@ -183,13 +183,13 @@ func TestGetPaymentSuccessful(t *testing.T) {
 }
 
 func TestGetPaymentNotFound(t *testing.T) {
-	response := ServeHTTP(methodGet, PreparePaymentURL(getPaymentPath, "1"), http.NoBody, notFound)
+	response := ServeHTTP(methodGet, preparePaymentURL(getPaymentPath, "1"), http.NoBody, notFound)
 
 	Equal(t, 404, response.Code)
 }
 
 func TestGetPaymentServerFailed(t *testing.T) {
-	response := ServeHTTP(methodGet, PreparePaymentURL(getPaymentPath, "1"), http.NoBody, dbFailure)
+	response := ServeHTTP(methodGet, preparePaymentURL(getPaymentPath, "1"), http.NoBody, dbFailure)
 
 	Equal(t, 500, response.Code)
 }
@@ -227,7 +227,7 @@ func MockRouter(mode string) (router *mux.Router) {
 	repository.mode = mode
 
 	SetPaymentRepository(repository)
-	router = ConfigureRouter()
+	router = configureRouter()
 	return router
 }
 
