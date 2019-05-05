@@ -48,6 +48,8 @@ func prepareFailureHeader(writer http.ResponseWriter, request *http.Request, err
 	}
 }
 
+// At the moment payment validation has very simple rules: OrganisationID is a required field and payment ID should be not empty for an update call
+// here we can add more complex validation rules if needed
 func decodeAndValidatePayment(request *http.Request, create bool) (payment Payment, err error) {
 	err = json.NewDecoder(request.Body).Decode(&payment)
 	if err != nil {

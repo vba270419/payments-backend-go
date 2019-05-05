@@ -120,8 +120,9 @@ For running manual tests you need to provide a payment payload. For that purpose
     
    The application reads them from a json configuration file, if a custom configuration file is not provided application will read _config/server.json_ by default.
 2) The application uses payment's **version** property to detect the conflicts while updating the payment, i.e. if the payment version does not match the version in the database, the application should return 409 code.
-3) In order to implement different storage, the **PaymentRepository** interface must be implemented accordingly.       
-
+3) Payment id and the version provided in a body of the create request are ignored. The version will be automatically set to 1 and the id will be generated on the server side.
+4) In order to implement different storage, the **PaymentRepository** interface must be implemented accordingly.
+5) At the moment payment validation has very simple rules: OrganisationID is a required field and payment ID should be not empty for an update call. More complex rules should be added to **decodeAndValidatePayment** method if needed (for example validating the currencies or amounts).      
 
 
 ## Out of the scope
@@ -129,4 +130,4 @@ Current implementation does **not** not support:
 - user authentication and authorization
 - secure MongoDB connection
 - pagination and filtering in get all payment resources
-- BDD 
+- BDD
