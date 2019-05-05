@@ -117,7 +117,8 @@ For running manual tests you need to provide a payment payload. For that purpose
     |**mongodb_host**   |MongoDB instance host address|127.0.0.1|
     |**mongodb_port**   |MongoDB instance port number|27017|  
     |**mongodb_timeout**|the maximum duration for querying and persisting payment resources before MongoDB session times out (in seconds)|10|
-    The application reads them from a json configuration file, if a custom configuration file is not provided application will read _config/server.json_ by default.
+    
+   The application reads them from a json configuration file, if a custom configuration file is not provided application will read _config/server.json_ by default.
 2) The application uses payment's **version** property to detect the conflicts while updating the payment, i.e. if the payment version does not match the version in the database, the application should return 409 code.
 3) In order to implement different storage, the **PaymentRepository** interface must be implemented accordingly.       
 
