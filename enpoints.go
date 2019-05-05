@@ -54,7 +54,7 @@ func DecodeAndValidatePayment(request *http.Request, create bool) (payment Payme
 		return payment, err
 	}
 
-	if len(payment.OrganisationId) == 0 || (!create && len(payment.ID) == 0) {
+	if len(payment.OrganisationID) == 0 || (!create && len(payment.ID) == 0) {
 		return payment, &InvalidPaymentError{payment}
 	}
 

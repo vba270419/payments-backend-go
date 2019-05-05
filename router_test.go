@@ -58,7 +58,7 @@ func (m *PaymentRepositoryMock) DeletePayment(paymentId string) (err error) {
 }
 
 func (m *PaymentRepositoryMock) GetPayment(paymentId string) (payment Payment, err error) {
-	payment = Payment{ID: paymentId, OrganisationId: "123", Version: 1}
+	payment = Payment{ID: paymentId, OrganisationID: "123", Version: 1}
 
 	switch m.mode {
 	case notFound:
@@ -71,9 +71,9 @@ func (m *PaymentRepositoryMock) GetPayment(paymentId string) (payment Payment, e
 }
 
 func (m *PaymentRepositoryMock) GetAllPayments() (payments []Payment, err error) {
-	payments = append(payments, Payment{ID: "1", OrganisationId: "123", Version: 1})
-	payments = append(payments, Payment{ID: "2", OrganisationId: "456", Version: 2})
-	payments = append(payments, Payment{ID: "3", OrganisationId: "789", Version: 3})
+	payments = append(payments, Payment{ID: "1", OrganisationID: "123", Version: 1})
+	payments = append(payments, Payment{ID: "2", OrganisationID: "456", Version: 2})
+	payments = append(payments, Payment{ID: "3", OrganisationID: "789", Version: 3})
 
 	switch m.mode {
 	case dbFailure:
@@ -178,7 +178,7 @@ func TestGetPaymentSuccessful(t *testing.T) {
 
 	Equal(t, 200, response.Code)
 	Equal(t, "2", paymentResult.Data.ID)
-	Equal(t, "123", paymentResult.Data.OrganisationId)
+	Equal(t, "123", paymentResult.Data.OrganisationID)
 	Equal(t, 1, paymentResult.Data.Version)
 }
 
@@ -209,9 +209,9 @@ func TestGetAllPaymentsSuccessful(t *testing.T) {
 	Equal(t, "2", result.Data[1].ID)
 	Equal(t, "3", result.Data[2].ID)
 
-	Equal(t, "123", result.Data[0].OrganisationId)
-	Equal(t, "456", result.Data[1].OrganisationId)
-	Equal(t, "789", result.Data[2].OrganisationId)
+	Equal(t, "123", result.Data[0].OrganisationID)
+	Equal(t, "456", result.Data[1].OrganisationID)
+	Equal(t, "789", result.Data[2].OrganisationID)
 }
 
 func TestGetAllPaymentsServerFailed(t *testing.T) {
@@ -232,7 +232,7 @@ func MockRouter(mode string) (router *mux.Router) {
 }
 
 func MockPayment(id string, organisationId string) *bytes.Buffer {
-	payment := &Payment{ID: id, OrganisationId: organisationId}
+	payment := &Payment{ID: id, OrganisationID: organisationId}
 	jsonPayment, _ := json.Marshal(payment)
 	return bytes.NewBuffer(jsonPayment)
 }

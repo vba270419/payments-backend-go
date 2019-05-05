@@ -30,7 +30,7 @@ func TestParsePaymentJson(t *testing.T) {
 	Equal(t, "Payment", payment.Type)
 	Equal(t, "4ee3a8d8-ca7b-4290-a52c-dd5b6165ec43", payment.ID)
 	Equal(t, 0, payment.Version)
-	Equal(t, "743d5b63-8e6f-432e-a8fa-c5d8d2ee5fcb", payment.OrganisationId)
+	Equal(t, "743d5b63-8e6f-432e-a8fa-c5d8d2ee5fcb", payment.OrganisationID)
 
 	Equal(t, float64(100.21), payment.Attributes.Amount)
 	Equal(t, "GBP", payment.Attributes.Currency)
@@ -40,8 +40,8 @@ func TestParsePaymentJson(t *testing.T) {
 	Equal(t, "BBAN", payment.Attributes.BeneficiaryParty.AccountNumberCode)
 	Equal(t, 0, payment.Attributes.BeneficiaryParty.AccountType)
 	Equal(t, "1 The Beneficiary Localtown SE2", payment.Attributes.BeneficiaryParty.Address)
-	Equal(t, "403000", payment.Attributes.BeneficiaryParty.BankId)
-	Equal(t, "GBDSC", payment.Attributes.BeneficiaryParty.BankIdCode)
+	Equal(t, "403000", payment.Attributes.BeneficiaryParty.BankID)
+	Equal(t, "GBDSC", payment.Attributes.BeneficiaryParty.BankIDCode)
 	Equal(t, "Wilfred Jeremiah Owens", payment.Attributes.BeneficiaryParty.Name)
 
 	Equal(t, "SHAR", payment.Attributes.ChargesInformation.BearerCode)
@@ -56,8 +56,8 @@ func TestParsePaymentJson(t *testing.T) {
 	Equal(t, "GB29XABC10161234567801", payment.Attributes.DebtorParty.AccountNumber)
 	Equal(t, "IBAN", payment.Attributes.DebtorParty.AccountNumberCode)
 	Equal(t, "10 Debtor Crescent Sourcetown NE1", payment.Attributes.DebtorParty.Address)
-	Equal(t, "203301", payment.Attributes.DebtorParty.BankId)
-	Equal(t, "GBDSC", payment.Attributes.DebtorParty.BankIdCode)
+	Equal(t, "203301", payment.Attributes.DebtorParty.BankID)
+	Equal(t, "GBDSC", payment.Attributes.DebtorParty.BankIDCode)
 	Equal(t, "Emelia Jane Brown", payment.Attributes.DebtorParty.Name)
 
 	Equal(t, "Wil piano Jan", payment.Attributes.EndToEndReference)
@@ -80,6 +80,6 @@ func TestParsePaymentJson(t *testing.T) {
 	Equal(t, "ImmediatePayment", payment.Attributes.SchemePaymentType)
 
 	Equal(t, "56781234", payment.Attributes.SponsorParty.AccountNumber)
-	Equal(t, "123123", payment.Attributes.SponsorParty.BankId)
-	Equal(t, "GBDSC", payment.Attributes.SponsorParty.BankIdCode)
+	Equal(t, "123123", payment.Attributes.SponsorParty.BankID)
+	Equal(t, "GBDSC", payment.Attributes.SponsorParty.BankIDCode)
 }
