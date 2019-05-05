@@ -33,10 +33,10 @@ func prepareFailureHeader(writer http.ResponseWriter, request *http.Request, err
 	case *PersistenceError:
 		writer.WriteHeader(http.StatusInternalServerError)
 		return
-	case *NotFoundError:
+	case *PaymentNotFoundError:
 		writer.WriteHeader(http.StatusNotFound)
 		return
-	case *VersionConflictError:
+	case *PaymentVersionConflictError:
 		writer.WriteHeader(http.StatusConflict)
 		return
 	case *InvalidPaymentError:

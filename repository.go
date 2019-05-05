@@ -60,7 +60,7 @@ func (m *mongoClient) UpdatePayment(payment Payment) (err error) {
 		if err != nil {
 			return err
 		}
-		return &VersionConflictError{payment.ID, currentVersion}
+		return &PaymentVersionConflictError{payment.ID, currentVersion}
 	}
 	return err
 }
@@ -78,7 +78,7 @@ func (m *mongoClient) DeletePayment(paymentID string) (err error) {
 	}
 
 	if result.DeletedCount == 0 {
-		return &NotFoundError{paymentID}
+		return &PaymentNotFoundError{paymentID}
 	}
 
 	return err
@@ -92,7 +92,7 @@ func (m *mongoClient) GetPayment(paymentID string) (payment Payment, err error) 
 
 	if err != nil {
 		if err.Error() == "mongo: no documents in result" {
-			return payment, &NotFoundError{paymentID}
+			return payment, &PaymentNotFoundError{paymentID}
 		}
 		log.Printf("Unexpected error while loading: %s", err.Error())
 	}

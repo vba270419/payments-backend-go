@@ -38,9 +38,9 @@ func (m *PaymentRepositoryMock) UpdatePayment(payment Payment) (err error) {
 	case dbFailure:
 		return &PersistenceError{}
 	case notFound:
-		return &NotFoundError{payment.ID}
+		return &PaymentNotFoundError{payment.ID}
 	case versionConflict:
-		return &VersionConflictError{payment.ID, payment.Version}
+		return &PaymentVersionConflictError{payment.ID, payment.Version}
 	default:
 		return
 	}
@@ -49,7 +49,7 @@ func (m *PaymentRepositoryMock) UpdatePayment(payment Payment) (err error) {
 func (m *PaymentRepositoryMock) DeletePayment(paymentID string) (err error) {
 	switch m.mode {
 	case notFound:
-		return &NotFoundError{paymentID}
+		return &PaymentNotFoundError{paymentID}
 	case dbFailure:
 		return &PersistenceError{}
 	default:
@@ -62,7 +62,7 @@ func (m *PaymentRepositoryMock) GetPayment(paymentID string) (payment Payment, e
 
 	switch m.mode {
 	case notFound:
-		return payment, &NotFoundError{paymentID}
+		return payment, &PaymentNotFoundError{paymentID}
 	case dbFailure:
 		return payment, &PersistenceError{}
 	default:
