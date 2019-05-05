@@ -26,7 +26,7 @@ func main() {
 
 	initializeEnvironmentProperties()
 
-	repository, mongoClient := InitializeMongoRepository()
+	repository, mongoClient := initializeMongoRepository()
 
 	SetPaymentRepository(repository)
 
@@ -62,7 +62,7 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), wait)
 	defer cancel()
 
-	ShutdownMongoRepository(mongoClient)
+	shutdownMongoRepository(mongoClient)
 
 	log.Printf("Stopping web server at [%s:%s] ...", host, port)
 	_ = server.Shutdown(ctx)
