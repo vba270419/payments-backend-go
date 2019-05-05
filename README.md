@@ -124,6 +124,17 @@ For running manual tests you need to provide a payment payload. For that purpose
 4) In order to implement different storage, the **PaymentRepository** interface must be implemented accordingly.
 5) At the moment payment validation has very simple rules: OrganisationID is a required field and payment ID should be not empty for an update call. More complex rules should be added to **decodeAndValidatePayment** method if needed (for example validating the currencies or amounts).      
 
+## 3rd party libraries
+| Library          | URL                   | Description |
+|---|---|----|
+|Gorilla web toolkit|https://www.gorillatoolkit.org/pkg/mux|Package mux implements a request router and dispatcher|
+|uuid|https://github.com/google/uuid|The uuid package generates and inspects UUIDs based on RFC 4122|
+|MongoDB Go Driver|https://github.com/mongodb/mongo-go-driver|The MongoDB supported driver for Go|
+|Viper|https://github.com/spf13/viper|Configuration solution for Go applications|
+|Testify|https://github.com/stretchr/testify|Set of packages that provide many tools for testifying Go code |
+
+
+
 
 ## Out of the scope
 Current implementation does **not** not support:
